@@ -8,3 +8,6 @@ sqlparse==0.4.4
 psycopg2-binary==2.9.10
 drf-spectacular==0.28.0
 drf-standardized-errors==0.14.1
+
+cryptography~=44.0.2
+PyJWT~=2.10.1
