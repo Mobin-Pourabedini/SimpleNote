@@ -25,21 +25,20 @@ class TenantMiddleware(MiddlewareMixin):
 
                 db_key = payload['db_name']
 
-                if db_key not in connections.databases:
-                    connections.databases[db_key] = {
-                        'ENGINE': 'django.db.backends.postgresql',
-                        'NAME': db_config['db_name'],
-                        'USER': POSTGRES_USER,
-                        'PASSWORD': POSTGRES_PASSWORD,
-                        'HOST': db_config['db_host'],
-                        'PORT': db_config['db_port'],
-                        'TIME_ZONE': settings.TIME_ZONE,
-                        'CONN_HEALTH_CHECKS': settings.DATABASES['default'].get('CONN_HEALTH_CHECKS', False),
-                        'CONN_MAX_AGE': settings.DATABASES['default'].get('CONN_MAX_AGE', 0),
-                        'AUTOCOMMIT': settings.DATABASES['default'].get('AUTOCOMMIT', True),
-                        'OPTIONS': settings.DATABASES['default'].get('OPTIONS', {}),
-                        'ATOMIC_REQUESTS': settings.DATABASES['default'].get('ATOMIC_REQUESTS', False),
-                    }
+                connections.databases[db_key] = {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': db_config['db_name'],
+                    'USER': POSTGRES_USER,
+                    'PASSWORD': POSTGRES_PASSWORD,
+                    'HOST': db_config['db_host'],
+                    'PORT': db_config['db_port'],
+                    'TIME_ZONE': settings.TIME_ZONE,
+                    'CONN_HEALTH_CHECKS': settings.DATABASES['default'].get('CONN_HEALTH_CHECKS', False),
+                    'CONN_MAX_AGE': settings.DATABASES['default'].get('CONN_MAX_AGE', 0),
+                    'AUTOCOMMIT': settings.DATABASES['default'].get('AUTOCOMMIT', True),
+                    'OPTIONS': settings.DATABASES['default'].get('OPTIONS', {}),
+                    'ATOMIC_REQUESTS': settings.DATABASES['default'].get('ATOMIC_REQUESTS', False),
+                }
 
                 set_current_tenant_db_config(db_config)
 
