@@ -19,9 +19,6 @@ class TenantMiddleware(MiddlewareMixin):
                     'db_host': payload['db_host'],
                     'db_port': payload['db_port'],
                 }
-                print("\n\n\n\n")
-                print(db_config)
-                print("\n\n\n\n")
 
                 db_key = payload['db_name']
 
