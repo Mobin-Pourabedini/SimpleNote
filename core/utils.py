@@ -6,10 +6,10 @@ import jwt
 import psycopg2
 from django.core.management import call_command
 from django.conf import settings
-from core.models import Tenant
 from cryptography.fernet import Fernet
 from psycopg2 import sql
 from django.db import connections
+from SimpleNote.settings.base import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB
 
 
 def generate_secure_key() -> str:
@@ -18,7 +18,7 @@ def generate_secure_key() -> str:
     return api_key.decode()
 
 
-def create_tenant(student_id, host='localhost', port='5432'):
+def create_tenant(student_id):
     """
     Automates the process of creating a new tenant database, running migrations,
     and registering the tenant in the `Tenant` model.
@@ -30,8 +30,9 @@ def create_tenant(student_id, host='localhost', port='5432'):
     try:
         # Connect to the default PostgreSQL database to create the new tenant DB
         conn = psycopg2.connect(
-            dbname='postgres', user='admin', password='complexpassword', host=host, port=port
+            dbname=POSTGRES_DB, user=POSTGRES_USER, password=POSTGRES_PASSWORD, host=POSTGRES_HOST, port=POSTGRES_PORT
         )
+        print("Connected to database! ...")
         conn.autocommit = True
         cursor = conn.cursor()
 
@@ -57,10 +58,10 @@ def create_tenant(student_id, host='localhost', port='5432'):
         connections.databases[f'{db_name}_admin'] = {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': db_name,
-            'USER': 'admin',  # TODO fix
-            'PASSWORD': 'complexpassword',  # TODO fix
-            'HOST': host,
-            'PORT': port,
+            'USER': POSTGRES_USER,
+            'PASSWORD': POSTGRES_PASSWORD,
+            'HOST': POSTGRES_HOST,
+            'PORT': POSTGRES_PORT,
             'TIME_ZONE': settings.TIME_ZONE,
             'CONN_HEALTH_CHECKS': settings.DATABASES['default'].get('CONN_HEALTH_CHECKS', False),  # ✅ Add this line
             'CONN_MAX_AGE': settings.DATABASES['default'].get('CONN_MAX_AGE', 0),  # ✅ Add this
@@ -86,12 +87,13 @@ def create_tenant(student_id, host='localhost', port='5432'):
     jwt_payload = {
         'student_id': student_id,
         'db_name': db_name,
-        'db_host': host,
-        'db_port': port,
+        'db_host': POSTGRES_HOST,
+        'db_port': POSTGRES_PORT,
         'exp': datetime.now() + timedelta(days=120),  # Token expires in 4 month
     }
 
     # Encode the JWT using the secret key (ensure SECRET_KEY is set in settings)
+    print(settings.SECRET_KEY)
     jwt_token = jwt.encode(jwt_payload, settings.SECRET_KEY, algorithm='HS256')
 
     return jwt_token
